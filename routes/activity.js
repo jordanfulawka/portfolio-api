@@ -7,7 +7,7 @@ const octokit = new Octokit({
 const router = express.Router();
 
 let activityCache = { data: null, lastFetched: 0 };
-const CACHE_TTL = 1000 * 60 * 15; // refetch every 15 minutes
+const CACHE_TTL = 1000 * 60; // refetch every 1 minute
 
 router.route('/activity').get(async (req, res) => {
   const now = Date.now();
