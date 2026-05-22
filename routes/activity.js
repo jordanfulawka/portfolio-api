@@ -12,7 +12,11 @@ const CACHE_TTL = 1000 * 60 * 15; // refetch every 15 minutes
 router.route('/activity').get(async (req, res) => {
   const now = Date.now();
 
-  if (activityCache.data && now - activityCache.lastFetched < CACHE_TTL) {
+  if (
+    activityCache.data &&
+    now - activityCache.lastFetched < CACHE_TTL &&
+    process.env.NODE_ENV === 'production'
+  ) {
     return res.json(activityCache.data);
   } else {
     console.log('endpoint running');
@@ -50,7 +54,8 @@ router.route('/activity').get(async (req, res) => {
       );
 
       return {
-        [repo]: response.data[0].commit.message,
+        repo: repo,
+        message: response.data[0].commit.message,
         date: response.data[0].commit.committer.date,
         languages: languages.data,
       };
@@ -110,9 +115,9 @@ router.route('/commits').get(async (req, res) => {
       repo: 'cm-compiler',
     },
   );
-  // const data = response.data[0].commit.committer.date;
+
   res.json({
-    data,
+    response,
   });
 });
 
