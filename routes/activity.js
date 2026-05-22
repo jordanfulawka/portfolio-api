@@ -103,7 +103,8 @@ router.route('/activity').get(async (req, res) => {
   const result = {
     status: 'success',
     top3,
-    time: { cumulative_total, daily_average },
+    cumulative_total,
+    daily_average,
     commit: mostRecent.value,
     totalCommits,
   };
