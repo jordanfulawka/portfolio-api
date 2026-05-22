@@ -3,6 +3,7 @@ require('dotenv').config();
 const activity = require('./routes/activity');
 
 const app = express();
+app.use(express.json());
 
 app.use('/api', activity);
 

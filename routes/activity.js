@@ -6,7 +6,17 @@ const octokit = new Octokit({
 });
 const router = express.Router();
 
+let activityCache = { data: null, lastFetched: 0 };
+const CACHE_TTL = 1000 * 60 * 15; // refetch every 15 minutes
+
 router.route('/activity').get(async (req, res) => {
+  const now = Date.now();
+
+  if (activityCache.data && now - activityCache.lastFetched < CACHE_TTL) {
+    return res.json(activityCache.data);
+  } else {
+    console.log('endpoint running');
+  }
   const repos = await octokit.request('GET /users/{username}/repos', {
     username: 'jordanfulawka',
     headers: {
@@ -78,14 +88,20 @@ router.route('/activity').get(async (req, res) => {
       .slice(0, 3),
   );
 
-  res.json({
+  const result = {
     status: 'success',
     top3,
     commit: mostRecent.value,
     totalCommits,
-  });
+  };
+
+  activityCache.data = result;
+  activityCache.lastFetched = now;
+
+  res.json(result);
 });
 
+// test function
 router.route('/commits').get(async (req, res) => {
   const response = await octokit.request(
     'GET /repos/{owner}/{repo}/commits?author=jordanfulawka',
