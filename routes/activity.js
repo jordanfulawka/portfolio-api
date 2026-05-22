@@ -93,9 +93,17 @@ router.route('/activity').get(async (req, res) => {
       .slice(0, 3),
   );
 
+  const stats = await fetch(
+    `https://wakatime.com/api/v1/users/current/summaries?range=last_7_days&api_key=${process.env.WAKATIME_API_KEY}`,
+  );
+
+  const statsData = await stats.json();
+  const { cumulative_total, daily_average } = statsData;
+
   const result = {
     status: 'success',
     top3,
+    time: { cumulative_total, daily_average },
     commit: mostRecent.value,
     totalCommits,
   };
